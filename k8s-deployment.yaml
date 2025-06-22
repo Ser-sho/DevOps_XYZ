@@ -1,0 +1,15 @@
+---
+- name:
+  hosts: kubernetes
+  # become: true
+  user: ubuntu
+
+  tasks:
+  - name: create a deployment
+    command: kubectl apply -f edureka-deploy.yaml
+# - name: update deployment with new pods if image updated in docker hub
+#   command: kubecti rollout restart deployment.v1.apps/edureka-deployment
+#
+  - name: create a service
+    command: kubectl apply -f edureka-service.yaml
+

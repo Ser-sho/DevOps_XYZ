@@ -1,0 +1,39 @@
+---
+- hosts: ansible
+  become: true  # Used for tasks that require root
+  tasks:
+
+    - name: Ensure Docker group exists
+      group:
+        name: docker
+        state: present
+
+    - name: Add user 'ubuntu' to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Restart Docker service to apply group changes
+      service:
+        name: docker
+        state: restarted
+
+    - name: Wait 5 seconds
+      pause:
+        seconds: 5
+
+    - name: Build Docker image
+      command: docker image build -t edu_devops:v1 .
+      args:
+        chdir: /opt/docker
+
+    - name: Tag Docker image for DockerHub
+      command: docker image tag edu_devops:v1 sersho1376/edu_devops:v1
+
+    - name: Push Docker image to DockerHub as ubuntu
+      command: docker image push sersho1376/edu_devops:v1
+      become: false
+      environment:
+        DOCKER_CONFIG: /home/ubuntu/.docker
+
